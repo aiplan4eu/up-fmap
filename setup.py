@@ -9,11 +9,11 @@ import urllib
 import shutil
 
 
-ENHSP_dst = './up_fmap/FMAP'
-ENHSP_PUBLIC = 'fmap'
+FMAP_dst = './up_fmap/FMAP'
+FMAP_PUBLIC = 'fmap'
 #COMPILE_CMD = './compile'
-ENHSP_TAG = 'master'
-ENHSP_REPO = 'https://bitbucket.org/altorler/fmap'
+FMAP_TAG = 'master'
+FMAP_REPO = 'https://bitbucket.org/altorler/fmap'
 
 long_description = \
     """============================================================
@@ -22,11 +22,11 @@ long_description = \
 """
 
 
-def install_ENHSP():
-    subprocess.run(['git', 'clone', '-b', ENHSP_TAG, ENHSP_REPO])
-    shutil.move(ENHSP_PUBLIC, ENHSP_dst)
+def install_FMAP():
+    subprocess.run(['git', 'clone', '-b', FMAP_TAG, FMAP_REPO])
+    shutil.move(FMAP_PUBLIC, FMAP_dst)
     curr_dir = os.getcwd()
-    os.chdir(ENHSP_dst)
+    os.chdir(FMAP_dst)
     #subprocess.run(COMPILE_CMD)
     os.system('mkdir fmap-dist')
     #os.system('cp -r libs/ enhsp-dist/')
@@ -34,19 +34,19 @@ def install_ENHSP():
     os.chdir(curr_dir)
 
 
-class InstallENHSP(build_py):
+class InstallFMAP(build_py):
     """Custom install command."""
 
     def run(self):
-        install_ENHSP()
+        install_FMAP()
         build_py.run(self)
 
 
-class InstallENHSPdevelop(develop):
+class InstallFMAPdevelop(develop):
     """Custom install command."""
 
     def run(self):
-        install_ENHSP()
+        install_FMAP()
         develop.run(self)
 
 
@@ -60,7 +60,7 @@ setup(name='up_fmap',
           "": ["FMAP/FMAP.jar"],
       },
       cmdclass={
-          'build_py': InstallENHSP,
-          'develop': InstallENHSPdevelop,
+          'build_py': InstallFMAP,
+          'develop': InstallFMAPdevelop,
       },
       license='APACHE')
