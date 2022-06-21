@@ -11,11 +11,11 @@ FMAP, and therefore this integrator requires openjdk 17 installed on your machin
 
 The installation has been tested in Ubuntu 20.04.3 LTS.
 
-## Planning approaches of UP supported:
+## Planning approaches of UP supported
 Multi-agent planning
 
-## Default configuration: 
-DTG + Landmarks: this option applies the multi-heuristic search scheme of the MH-FMAP solver described in this [paper](https://ojs.aaai.org/index.php/ICAPS/article/view/13701) by combining the h_DTG and h_Land heuristics to guide the search.
+## Default configuration
+DTG + Landmarks: this option applies the multi-heuristic search scheme of the MH-FMAP solver (described in this [paper](https://ojs.aaai.org/index.php/ICAPS/article/view/13701)) by combining the h_DTG and h_Land heuristics to guide the search.
 
-## Operative modes of UP currently supported:
+## Operative modes of UP currently supported
 One shot planning (ongoing)
