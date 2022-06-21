@@ -20,10 +20,16 @@ long_description = \
     UP_FMAP
  ============================================================
 """
-
+isExist = os.path.exists('up_fmap')
+if not isExist:
+	os.system('mkdir up_fmap')
 
 def install_FMAP():
     subprocess.run(['git', 'clone', '-b', FMAP_TAG, FMAP_REPO])
+    isExist = os.path.exists(FMAP_dst)
+    if not isExist:
+    	os.makedirs(FMAP_dst)
+
     shutil.move(FMAP_PUBLIC, FMAP_dst)
     curr_dir = os.getcwd()
     os.chdir(FMAP_dst)
