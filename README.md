@@ -4,7 +4,7 @@ FMAP uses a distributed heuristic search strategy. Each planning agent in the pl
 FMAP leverages a forward-chaining partial-order planner (POP) that allows agents to plan their actions in parallel whenever possible, which largely improves the quality of the resulting solution plans. Moreover, the forward-chaining approach relies on the frontier state (state that results from executing the actions of a node) to compute accurate state-based estimates.
 
 ## Installation
-After cloning this repository run ```pip install fmap/```. 
+After cloning this repository run ```pip install up-fmap/```. 
 
 FMAP will be downloaded from the public repository of FMAP.
 FMAP, and therefore this integrator requires openjdk 17 installed on your machine.
