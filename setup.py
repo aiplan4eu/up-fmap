@@ -26,14 +26,12 @@ if not isExist:
 
 def install_FMAP():
     subprocess.run(['git', 'clone', '-b', FMAP_TAG, FMAP_REPO])
-    isExist = os.path.exists(FMAP_dst)
-    if not isExist:
-    	os.makedirs(FMAP_dst)
-
     shutil.move(FMAP_PUBLIC, FMAP_dst)
     curr_dir = os.getcwd()
     os.chdir(FMAP_dst)
     #subprocess.run(COMPILE_CMD)
+    os.system('rm -r out 2> /dev/null')
+    os.system('rm -r fmap-dist 2> /dev/null')
     os.system('mkdir fmap-dist')
     #os.system('cp -r libs/ enhsp-dist/')
     os.system('cp FMAP.jar fmap-dist/')
