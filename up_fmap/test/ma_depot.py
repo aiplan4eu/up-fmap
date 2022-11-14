@@ -246,5 +246,6 @@ def get_example_problems():
     problems["ma_depot"] = depot
     return problems
 
+
 problems = get_example_problems()
 problem = problems["ma_depot"].problem

@@ -7,17 +7,21 @@ from unified_planning.engines.pddl_planner import *
 from unified_planning.engines import PDDLPlanner, Credits, LogMessage
 
 
-credits = Credits('FMAP',
-                  'Alejandro Torreño, Oscar Sapena and Eva Onaindia',
-                  'altorler@upvnet.upv.es, osapena@dsic.upv.es',
-                  'https://bitbucket.org/altorler/fmap/src/master/',
-                  'GPL',
-                  'FMAP: A Platform for the Development of Distributed Multi-Agent Planning Systems.',
-                  'FMAP uses a distributed heuristic search strategy. Each planning agent in the platform features an embedded search engine based on a forward partial-order planning scheme. ')
+credits = Credits(
+    "FMAP",
+    "Alejandro Torreño, Oscar Sapena and Eva Onaindia",
+    "altorler@upvnet.upv.es, osapena@dsic.upv.es",
+    "https://bitbucket.org/altorler/fmap/src/master/",
+    "GPL",
+    "FMAP: A Platform for the Development of Distributed Multi-Agent Planning Systems.",
+    "FMAP uses a distributed heuristic search strategy. Each planning agent in the platform features an embedded search engine based on a forward partial-order planning scheme. ",
+)
+
 
 class FMAPsolver(PDDLPlanner):
-
-    def __init__(self, search_algorithm: Optional[str] = None, heuristic: Optional[str] = None):
+    def __init__(
+        self, search_algorithm: Optional[str] = None, heuristic: Optional[str] = None
+    ):
         super().__init__(needs_requirements=False)
         self.search_algorithm = search_algorithm
         self.heuristic = heuristic
@@ -28,26 +32,39 @@ class FMAPsolver(PDDLPlanner):
 
     def _manage_parameters(self, command):
         if self.search_algorithm is not None:
-            command += ['-s', self.search_algorithm]
+            command += ["-s", self.search_algorithm]
         if self.heuristic is not None:
-            command += ['-h', self.heuristic]
+            command += ["-h", self.heuristic]
         return command
 
-    def _get_cmd(self, domain_filename: str, problem_filename: str, plan_filename) -> List[str]:
-        base_command = ['java', '-jar', pkg_resources.resource_filename("up_fmap", 'FMAP/FMAP.jar')]
+    def _get_cmd(
+        self, domain_filename: str, problem_filename: str, plan_filename
+    ) -> List[str]:
+        base_command = [
+            "java",
+            "-jar",
+            pkg_resources.resource_filename("up_fmap", "FMAP/FMAP.jar"),
+        ]
         directory = "ma_pddl_"
         for ag in problem.agents:
-            base_command.extend([f'{ag.name}_type', f'{directory}{domain_filename}{ag.name}_domain.pddl'])
-            base_command.extend([f'{directory}{problem_filename}{ag.name}_problem.pddl'])
+            base_command.extend(
+                [
+                    f"{ag.name}_type",
+                    f"{directory}{domain_filename}{ag.name}_domain.pddl",
+                ]
+            )
+            base_command.extend(
+                [f"{directory}{problem_filename}{ag.name}_problem.pddl"]
+            )
         return self._manage_parameters(base_command)
 
     def _result_status(
         self,
-        problem: 'up.model.multi_agent.MultiAgentProblem',
-        plan: Optional['up.plans.Plan'],
+        problem: "up.model.multi_agent.MultiAgentProblem",
+        plan: Optional["up.plans.Plan"],
         retval: int = 0,
-        log_messages: Optional[List['LogMessage']] = None,
-    ) -> 'PlanGenerationResultStatus':
+        log_messages: Optional[List["LogMessage"]] = None,
+    ) -> "PlanGenerationResultStatus":
         if retval != 0:
             return PlanGenerationResultStatus.INTERNAL_ERROR
         elif plan is None:
@@ -56,7 +73,7 @@ class FMAPsolver(PDDLPlanner):
             return PlanGenerationResultStatus.SOLVED_SATISFICING
 
     @staticmethod
-    def supported_kind() -> 'ProblemKind':
+    def supported_kind() -> "ProblemKind":
         supported_kind = ProblemKind()
         supported_kind.set_problem_class("ACTION_BASED_MULTI_AGENT")
         supported_kind.set_typing("FLAT_TYPING")
@@ -71,21 +88,21 @@ class FMAPsolver(PDDLPlanner):
         return supported_kind
 
     @staticmethod
-    def supports(problem_kind: 'ProblemKind') -> bool:
+    def supports(problem_kind: "ProblemKind") -> bool:
         return problem_kind <= ENHSPEngine.supported_kind()
 
     @staticmethod
-    def get_credits(**kwargs) -> Optional['Credits']:
+    def get_credits(**kwargs) -> Optional["Credits"]:
         return credits
 
     def solve_ma(
         self,
         problem: "up.model.AbstractProblem",
         callback: Optional[
-         Callable[["up.engines.results.PlanGenerationResult"], None]
+            Callable[["up.engines.results.PlanGenerationResult"], None]
         ] = None,
         heuristic: Optional[
-         Callable[["up.model.state.ROState"], Optional[float]]
+            Callable[["up.model.state.ROState"], Optional[float]]
         ] = None,
         timeout: Optional[float] = None,
         output_stream: Optional[IO[str]] = None,
@@ -163,6 +180,7 @@ class FMAPsolver(PDDLPlanner):
         return PlanGenerationResult(
             status, plan, log_messages=logs, engine_name=self.name
         )
+
 
 w = FMAPsolver()
 w.solve_ma(problem)
