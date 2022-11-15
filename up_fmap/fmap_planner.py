@@ -1,10 +1,27 @@
-import unified_planning.engines
-from unified_planning.model.problem_kind import ProblemKind
-import pkg_resources
-from unified_planning.io.ma_pddl_writer import MAPDDLWriter
+import pkg_resources  # type: ignore
+import unified_planning as up  # type: ignore
+from unified_planning.model import ProblemKind  # type: ignore
+from unified_planning.engines import PDDLPlanner, Credits, LogMessage  # type: ignore
+from typing import Callable, Dict, IO, List, Optional, Set, Union, cast  # type: ignore
+from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
+import tempfile
+import os
+import subprocess
+import sys
+import asyncio
+from asyncio.subprocess import PIPE
 from test.ma_depot import problem
-from unified_planning.engines.pddl_planner import *
-from unified_planning.engines import PDDLPlanner, Credits, LogMessage
+from unified_planning.engines.pddl_planner import (
+    run_command_asyncio,
+    run_command_posix_select,
+    USE_ASYNCIO_ON_UNIX,
+)  # type: ignore
+from unified_planning.engines.results import (
+    LogLevel,
+    LogMessage,
+    PlanGenerationResult,
+    PlanGenerationResultStatus,
+)  # type: ignore
 
 
 credits = Credits(
@@ -89,7 +106,7 @@ class FMAPsolver(PDDLPlanner):
 
     @staticmethod
     def supports(problem_kind: "ProblemKind") -> bool:
-        return problem_kind <= ENHSPEngine.supported_kind()
+        return problem_kind <= FMAPsolver.supported_kind()
 
     @staticmethod
     def get_credits(**kwargs) -> Optional["Credits"]:

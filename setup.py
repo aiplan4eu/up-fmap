@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import subprocess
 
-from setuptools import setup
-from setuptools.command.build_py import build_py
-from setuptools.command.develop import develop
+from setuptools import setup  # type: ignore
+from setuptools.command.build_py import build_py  # type: ignore
+from setuptools.command.develop import develop  # type: ignore
 import os
 import urllib
 import shutil

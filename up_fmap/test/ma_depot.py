@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from unified_planning.shortcuts import *
-from unified_planning.model.multi_agent import *
-from collections import namedtuple
-from unified_planning.io.ma_pddl_writer import MAPDDLWriter
+from unified_planning.shortcuts import *  # type: ignore
+from unified_planning.model.multi_agent import *  # type: ignore
+from collections import namedtuple  # type: ignore
+from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
 
 Example = namedtuple("Example", ["problem", "plan"])
 
