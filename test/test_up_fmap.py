@@ -1,27 +1,16 @@
-# Copyright 2021 AIPlan4EU project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 from unified_planning.shortcuts import *  # type: ignore
 from unified_planning.model.multi_agent import *  # type: ignore
 from collections import namedtuple  # type: ignore
 from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
+from unittest import TestCase, main
+import pkg_resources
+from up_fmap import FMAPsolver
+from ma_depot import get_example_problems  # type: ignore
 
 Example = namedtuple("Example", ["problem", "plan"])
 
 
-def get_example_problems():
-    problems = {}
-
+class FMAPtest(TestCase):
     # ma-depot
     place = UserType("place")
     locatable = UserType("locatable")
@@ -188,9 +177,9 @@ def get_example_problems():
     pallet1 = Object("pallet1", pallet)
     pallet2 = Object("pallet2", pallet)
 
-    hoist0 = Object("hoist0", hoist)  # Per il momento oggetto publico
-    hoist1 = Object("hoist1", hoist)  # Per il momento oggetto publico
-    hoist2 = Object("hoist2", hoist)  # Per il momento oggetto publico
+    hoist0 = Object("hoist0", hoist)
+    hoist1 = Object("hoist1", hoist)
+    hoist2 = Object("hoist2", hoist)
 
     problem.add_object(crate0)
     problem.add_object(crate1)
@@ -241,11 +230,7 @@ def get_example_problems():
     problem.add_goal(on(crate0, pallet2))
     problem.add_goal(on(crate1, pallet1))
 
-    plan = None
-    depot = Example(problem=problem, plan=plan)
-    problems["ma_depot"] = depot
-    return problems
+    s = FMAPsolver()
+    ma_solve = s.solve_ma(problem)
 
-
-problems = get_example_problems()
-problem = problems["ma_depot"].problem
+    print(ma_solve.status, ma_solve.plan, ma_solve.log_messages, ma_solve.engine_name)

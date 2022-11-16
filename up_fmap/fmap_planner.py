@@ -9,8 +9,6 @@ import os
 import subprocess
 import sys
 import asyncio
-from asyncio.subprocess import PIPE
-from test.ma_depot import problem
 from unified_planning.engines.pddl_planner import (
     run_command_asyncio,
     run_command_posix_select,
@@ -22,7 +20,7 @@ from unified_planning.engines.results import (
     PlanGenerationResult,
     PlanGenerationResultStatus,
 )  # type: ignore
-
+from unified_planning.model.multi_agent import MultiAgentProblem  # type: ignore
 
 credits = Credits(
     "FMAP",
@@ -54,9 +52,13 @@ class FMAPsolver(PDDLPlanner):
             command += ["-h", self.heuristic]
         return command
 
-    def _get_cmd(
-        self, domain_filename: str, problem_filename: str, plan_filename
-    ) -> List[str]:
+    def _get_cmd_ma(
+        self,
+        problem: MultiAgentProblem,
+        domain_filename: str,
+        problem_filename: str,
+        plan_filename: str,
+    ):
         base_command = [
             "java",
             "-jar",
@@ -114,7 +116,7 @@ class FMAPsolver(PDDLPlanner):
 
     def solve_ma(
         self,
-        problem: "up.model.AbstractProblem",
+        problem: "up.model.multi_agent.MultiAgentProblem",
         callback: Optional[
             Callable[["up.engines.results.PlanGenerationResult"], None]
         ] = None,
@@ -134,7 +136,9 @@ class FMAPsolver(PDDLPlanner):
             plan_filename = os.path.join(tempdir, "plan.txt")
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
-            cmd = self._get_cmd(domain_filename, problem_filename, plan_filename)
+            cmd = self._get_cmd_ma(
+                problem, domain_filename, problem_filename, plan_filename
+            )
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
@@ -193,11 +197,6 @@ class FMAPsolver(PDDLPlanner):
         status: PlanGenerationResultStatus = self._result_status(
             problem, plan, retval, logs
         )
-        print(status, plan, logs, self.name)
         return PlanGenerationResult(
             status, plan, log_messages=logs, engine_name=self.name
         )
-
-
-w = FMAPsolver()
-w.solve_ma(problem)
