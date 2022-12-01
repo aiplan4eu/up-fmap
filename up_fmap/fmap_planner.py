@@ -95,6 +95,7 @@ class FMAPsolver(PDDLPlanner):
         supported_kind = ProblemKind()
         supported_kind.set_problem_class("ACTION_BASED_MULTI_AGENT")
         supported_kind.set_typing("FLAT_TYPING")
+        supported_kind.set_typing("HIERARCHICAL_TYPING")
         supported_kind.set_conditions_kind("NEGATIVE_CONDITIONS")
         supported_kind.set_conditions_kind("DISJUNCTIVE_CONDITIONS")
         supported_kind.set_conditions_kind("EQUALITY")
