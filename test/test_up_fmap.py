@@ -5,9 +5,9 @@ from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
 from unittest import TestCase, main
 import pkg_resources
 from up_fmap import FMAPsolver
-from ma_depot import get_example_problems  # type: ignore
+#from ma_depot import get_example_problems  # type: ignore
 
-Example = namedtuple("Example", ["problem", "plan"])
+#Example = namedtuple("Example", ["problem", "plan"])
 
 
 class FMAPtest(TestCase):

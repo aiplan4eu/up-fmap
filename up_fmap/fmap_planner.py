@@ -21,6 +21,9 @@ from unified_planning.engines.results import (
     PlanGenerationResultStatus,
 )  # type: ignore
 from unified_planning.model.multi_agent import MultiAgentProblem  # type: ignore
+import re
+from unified_planning.plans.partial_order_plan import PartialOrderPlan
+from collections import defaultdict
 
 credits = Credits(
     "FMAP",
@@ -131,9 +134,10 @@ class FMAPsolver(PDDLPlanner):
         plan = None
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
-            domain_filename = os.path.join(tempdir, "domain.pddl/")
-            problem_filename = os.path.join(tempdir, "problem.pddl/")
+            domain_filename = os.path.join(tempdir, "domain_pddl/")
+            problem_filename = os.path.join(tempdir, "problem_pddl/")
             plan_filename = os.path.join(tempdir, "plan.txt")
+            plan_filename = "ma_pddl_" + plan_filename
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
             cmd = self._get_cmd_ma(
@@ -181,6 +185,10 @@ class FMAPsolver(PDDLPlanner):
                         )
                 timeout_occurred, (proc_out, proc_err), retval = exec_res
 
+            f = open(plan_filename, "a+")
+            for line in proc_out:
+                f.write(line + "\n")
+            f.close()
             logs.append(up.engines.results.LogMessage(LogLevel.INFO, "".join(proc_out)))
             logs.append(
                 up.engines.results.LogMessage(LogLevel.ERROR, "".join(proc_err))
@@ -200,3 +208,63 @@ class FMAPsolver(PDDLPlanner):
         return PlanGenerationResult(
             status, plan, log_messages=logs, engine_name=self.name
         )
+
+    def _plan_from_file(
+            self,
+            problem: "up.model.multi_agent.MultiAgentProblem",
+            plan_filename: str,
+            get_item_named: Callable[
+                [str],
+                Union[
+                    "up.model.Type",
+                    "up.model.Action",
+                    "up.model.Fluent",
+                    "up.model.Object",
+                    "up.model.Parameter",
+                    "up.model.Variable",
+                    "up.model.multi_agent.Agent",
+                ],
+            ],
+    ) -> "up.plans.Plan":
+        """
+        Takes a problem, a filename and a map of renaming and returns the plan parsed from the file.
+
+        :param problem: The up.model.problem.Problem instance for which the plan is generated.
+        :param plan_filename: The path of the file in which the plan is written.
+        :param get_item_named: A function that takes a name and returns the original up.model element instance
+            linked to that renaming.
+        :return: The up.plans.Plan corresponding to the parsed plan from the file
+        """
+        #^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))
+        dates_dict = defaultdict(list)
+        adjacent_list = defaultdict(list)
+        with open(plan_filename) as plan:
+            for line in plan.readlines():
+                line = line.lower()
+                match_line = re.match(r"^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))", line)
+                if match_line:
+                    timestamp = match_line.group(1)
+                    action_name = match_line.group(2)
+                    agent_name = match_line.group(3)
+                    params_name = match_line.group(4).split()
+
+                    action = get_item_named(action_name)
+                    agent = get_item_named(agent_name)
+                    assert isinstance(action, up.model.Action), "Wrong plan or renaming."
+                    parameters = []
+                    for p in params_name:
+                        obj = get_item_named(p)
+                        assert isinstance(obj, up.model.Object), "Wrong plan or renaming."
+                        parameters.append(problem.env.expression_manager.ObjectExp(obj))
+                    act_instance = up.plans.ActionInstance(action, tuple(parameters), agent)
+
+                    dates_dict[timestamp].append(act_instance)
+
+            dict_s = sorted(dates_dict.items())
+            for k, v in enumerate(dict_s):
+                index = k + 1
+                for action in v[1]:
+                    if index < len(dates_dict):
+                        next_action = dict_s[k + 1][1]
+                        adjacent_list[action].extend(next_action)
+        return up.plans.PartialOrderPlan(adjacent_list)
