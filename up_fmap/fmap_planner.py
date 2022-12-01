@@ -138,9 +138,7 @@ class FMAPsolver(PDDLPlanner):
             plan_filename = "ma_pddl_" + plan_filename
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
-            cmd = self._get_cmd_ma(
-                problem, domain_filename, problem_filename, plan_filename
-            )
+            cmd = self._get_cmd_ma(problem, domain_filename, problem_filename)
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
