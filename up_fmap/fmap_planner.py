@@ -117,32 +117,30 @@ class FMAPsolver(PDDLPlanner):
     def get_credits(**kwargs) -> Optional["Credits"]:
         return credits
 
-    def solve_ma(
-        self,
-        problem: "up.model.multi_agent.MultiAgentProblem",
-        callback: Optional[
-            Callable[["up.engines.results.PlanGenerationResult"], None]
-        ] = None,
-        heuristic: Optional[
-            Callable[["up.model.state.ROState"], Optional[float]]
-        ] = None,
-        timeout: Optional[float] = None,
-        output_stream: Optional[IO[str]] = None,
+    def _solve(
+            self,
+            problem: "up.model.AbstractProblem",
+            callback: Optional[
+                Callable[["up.engines.results.PlanGenerationResult"], None]
+            ] = None,
+            heuristic: Optional[
+                Callable[["up.model.state.ROState"], Optional[float]]
+            ] = None,
+            timeout: Optional[float] = None,
+            output_stream: Optional[IO[str]] = None,
     ) -> "up.engines.results.PlanGenerationResult":
-        assert isinstance(problem, up.model.multi_agent.MultiAgentProblem)
-        w = MAPDDLWriter(problem)
+        assert isinstance(problem, up.model.Problem) or isinstance(problem, up.model.multi_agent.MultiAgentProblem)
         plan = None
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
+            w = MAPDDLWriter(problem)
             domain_filename = os.path.join(tempdir, "domain_pddl/")
             problem_filename = os.path.join(tempdir, "problem_pddl/")
             plan_filename = os.path.join(tempdir, "plan.txt")
             plan_filename = "ma_pddl_" + plan_filename
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
-            cmd = self._get_cmd_ma(
-                problem, domain_filename, problem_filename, plan_filename
-            )
+            cmd = self._get_cmd_ma(problem, domain_filename, problem_filename, plan_filename)
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
@@ -184,7 +182,6 @@ class FMAPsolver(PDDLPlanner):
                             cmd, output_stream=output_stream, timeout=timeout
                         )
                 timeout_occurred, (proc_out, proc_err), retval = exec_res
-
             f = open(plan_filename, "a+")
             for line in proc_out:
                 f.write(line + "\n")

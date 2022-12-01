@@ -231,6 +231,6 @@ class FMAPtest(TestCase):
     problem.add_goal(on(crate1, pallet1))
 
     s = FMAPsolver()
-    ma_solve = s.solve_ma(problem)
+    ma_solve = s._solve(problem)
 
     print(ma_solve.status, ma_solve.plan, ma_solve.log_messages, ma_solve.engine_name)
