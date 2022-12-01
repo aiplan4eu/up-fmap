@@ -270,3 +270,7 @@ class FMAPsolver(PDDLPlanner):
                         next_action = dict_s[k + 1][1]
                         adjacent_list[action].extend(next_action)
         return up.plans.PartialOrderPlan(adjacent_list)
+
+
+env = up.environment.get_env()
+env.factory.add_engine("fmap", __name__, "FMAPsolver")
