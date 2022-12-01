@@ -56,11 +56,7 @@ class FMAPsolver(PDDLPlanner):
         return command
 
     def _get_cmd_ma(
-        self,
-        problem: MultiAgentProblem,
-        domain_filename: str,
-        problem_filename: str,
-        plan_filename: str,
+        self, problem: MultiAgentProblem, domain_filename: str, problem_filename: str
     ):
         base_command = [
             "java",
@@ -118,18 +114,20 @@ class FMAPsolver(PDDLPlanner):
         return credits
 
     def _solve(
-            self,
-            problem: "up.model.AbstractProblem",
-            callback: Optional[
-                Callable[["up.engines.results.PlanGenerationResult"], None]
-            ] = None,
-            heuristic: Optional[
-                Callable[["up.model.state.ROState"], Optional[float]]
-            ] = None,
-            timeout: Optional[float] = None,
-            output_stream: Optional[IO[str]] = None,
+        self,
+        problem: "up.model.AbstractProblem",
+        callback: Optional[
+            Callable[["up.engines.results.PlanGenerationResult"], None]
+        ] = None,
+        heuristic: Optional[
+            Callable[["up.model.state.ROState"], Optional[float]]
+        ] = None,
+        timeout: Optional[float] = None,
+        output_stream: Optional[IO[str]] = None,
     ) -> "up.engines.results.PlanGenerationResult":
-        assert isinstance(problem, up.model.Problem) or isinstance(problem, up.model.multi_agent.MultiAgentProblem)
+        assert isinstance(problem, up.model.Problem) or isinstance(
+            problem, up.model.multi_agent.MultiAgentProblem
+        )
         plan = None
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
@@ -140,7 +138,9 @@ class FMAPsolver(PDDLPlanner):
             plan_filename = "ma_pddl_" + plan_filename
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
-            cmd = self._get_cmd_ma(problem, domain_filename, problem_filename, plan_filename)
+            cmd = self._get_cmd_ma(
+                problem, domain_filename, problem_filename, plan_filename
+            )
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
@@ -207,21 +207,21 @@ class FMAPsolver(PDDLPlanner):
         )
 
     def _plan_from_file(
-            self,
-            problem: "up.model.multi_agent.MultiAgentProblem",
-            plan_filename: str,
-            get_item_named: Callable[
-                [str],
-                Union[
-                    "up.model.Type",
-                    "up.model.Action",
-                    "up.model.Fluent",
-                    "up.model.Object",
-                    "up.model.Parameter",
-                    "up.model.Variable",
-                    "up.model.multi_agent.Agent",
-                ],
+        self,
+        problem: "up.model.multi_agent.MultiAgentProblem",
+        plan_filename: str,
+        get_item_named: Callable[
+            [str],
+            Union[
+                "up.model.Type",
+                "up.model.Action",
+                "up.model.Fluent",
+                "up.model.Object",
+                "up.model.Parameter",
+                "up.model.Variable",
+                "up.model.multi_agent.Agent",
             ],
+        ],
     ) -> "up.plans.Plan":
         """
         Takes a problem, a filename and a map of renaming and returns the plan parsed from the file.
@@ -232,7 +232,7 @@ class FMAPsolver(PDDLPlanner):
             linked to that renaming.
         :return: The up.plans.Plan corresponding to the parsed plan from the file
         """
-        #^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))
+        # ^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))
         dates_dict = defaultdict(list)
         adjacent_list = defaultdict(list)
         with open(plan_filename) as plan:
@@ -247,13 +247,19 @@ class FMAPsolver(PDDLPlanner):
 
                     action = get_item_named(action_name)
                     agent = get_item_named(agent_name)
-                    assert isinstance(action, up.model.Action), "Wrong plan or renaming."
+                    assert isinstance(
+                        action, up.model.Action
+                    ), "Wrong plan or renaming."
                     parameters = []
                     for p in params_name:
                         obj = get_item_named(p)
-                        assert isinstance(obj, up.model.Object), "Wrong plan or renaming."
+                        assert isinstance(
+                            obj, up.model.Object
+                        ), "Wrong plan or renaming."
                         parameters.append(problem.env.expression_manager.ObjectExp(obj))
-                    act_instance = up.plans.ActionInstance(action, tuple(parameters), agent)
+                    act_instance = up.plans.ActionInstance(
+                        action, tuple(parameters), agent
+                    )
 
                     dates_dict[timestamp].append(act_instance)
 
