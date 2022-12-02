@@ -97,11 +97,6 @@ class FMAPsolver(PDDLPlanner):
         supported_kind.set_typing("FLAT_TYPING")
         supported_kind.set_typing("HIERARCHICAL_TYPING")
         supported_kind.set_conditions_kind("NEGATIVE_CONDITIONS")
-        supported_kind.set_conditions_kind("DISJUNCTIVE_CONDITIONS")
-        supported_kind.set_conditions_kind("EQUALITY")
-        supported_kind.set_conditions_kind("EXISTENTIAL_CONDITIONS")
-        supported_kind.set_conditions_kind("UNIVERSAL_CONDITIONS")
-        supported_kind.set_effects_kind("CONDITIONAL_EFFECTS")
         supported_kind.set_fluents_type("NUMERIC_FLUENTS")
         supported_kind.set_fluents_type("OBJECT_FLUENTS")
         return supported_kind
