@@ -231,7 +231,6 @@ class FMAPtest(TestCase):
     problem.add_goal(on(crate0, pallet2))
     problem.add_goal(on(crate1, pallet1))
 
-    s = FMAPsolver()
-    ma_solve = s._solve(problem)
-
-    print(ma_solve.status, ma_solve.plan, ma_solve.log_messages, ma_solve.engine_name)
+    with OneshotPlanner(name="fmap") as planner:
+        plan = planner.solve(problem)
+        print("%s returned: %s" % (planner.name, plan))
