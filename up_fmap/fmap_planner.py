@@ -97,6 +97,11 @@ class FMAPsolver(PDDLPlanner):
         supported_kind.set_typing("FLAT_TYPING")
         supported_kind.set_typing("HIERARCHICAL_TYPING")
         supported_kind.set_conditions_kind("NEGATIVE_CONDITIONS")
+        supported_kind.set_conditions_kind("DISJUNCTIVE_CONDITIONS")
+        supported_kind.set_conditions_kind("EQUALITY")
+        supported_kind.set_conditions_kind("EXISTENTIAL_CONDITIONS")
+        supported_kind.set_conditions_kind("UNIVERSAL_CONDITIONS")
+        supported_kind.set_effects_kind("CONDITIONAL_EFFECTS")
         supported_kind.set_fluents_type("NUMERIC_FLUENTS")
         supported_kind.set_fluents_type("OBJECT_FLUENTS")
         return supported_kind
@@ -135,6 +140,8 @@ class FMAPsolver(PDDLPlanner):
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
             cmd = self._get_cmd_ma(problem, domain_filename, problem_filename)
+            if heuristic is not None:
+                cmd += ["-h", heuristic]
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
@@ -176,16 +183,30 @@ class FMAPsolver(PDDLPlanner):
                             cmd, output_stream=output_stream, timeout=timeout
                         )
                 timeout_occurred, (proc_out, proc_err), retval = exec_res
+
             f = open(plan_filename, "a+")
+            pattern = re.compile(r"^[Ee]rror|[Ee]xception")
+            FAMP_error = False
             for line in proc_out:
-                f.write(line + "\n")
+                if pattern.search(line):
+                    FAMP_error = True
+                else:
+                    f.write(line + "\n")
             f.close()
+
             logs.append(up.engines.results.LogMessage(LogLevel.INFO, "".join(proc_out)))
             logs.append(
                 up.engines.results.LogMessage(LogLevel.ERROR, "".join(proc_err))
             )
-            if os.path.isfile(plan_filename):
-                plan = self._plan_from_file(problem, plan_filename, w.get_item_named)
+
+            if not FAMP_error:
+                if os.path.isfile(plan_filename):
+                    plan = self._plan_from_file(
+                        problem, plan_filename, w.get_item_named
+                    )
+            else:
+                plan = None
+
             if timeout_occurred and retval != 0:
                 return PlanGenerationResult(
                     PlanGenerationResultStatus.TIMEOUT,
@@ -234,6 +255,7 @@ class FMAPsolver(PDDLPlanner):
                 line = line.lower()
                 match_line = re.match(r"^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))", line)
                 if match_line:
+
                     timestamp = match_line.group(1)
                     action_name = match_line.group(2)
                     agent_name = match_line.group(3)
