@@ -185,12 +185,12 @@ class FMAPsolver(PDDLPlanner):
                 timeout_occurred, (proc_out, proc_err), retval = exec_res
 
             f = open(plan_filename, "a+")
-            pattern = re.compile(r"^[Ee]rror|[Ee]xception")
+            pattern = re.compile(r"[Ee]rror|[Ee]xception")
             FAMP_error = False
             for line in proc_out:
                 if pattern.search(line):
                     FAMP_error = True
-                else:
+                if not FAMP_error:
                     f.write(line + "\n")
             f.close()
 
