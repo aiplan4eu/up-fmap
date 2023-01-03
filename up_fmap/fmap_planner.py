@@ -253,13 +253,18 @@ class FMAPsolver(PDDLPlanner):
         with open(plan_filename) as plan:
             for line in plan.readlines():
                 line = line.lower()
-                match_line = re.match(r"^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))", line)
+                # match_line = re.match(r"^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))", line)
+                match_line = re.match(r"^(\d*).+\((\S*)\s([^)\s]+)(?:\s(.+))?\)", line)
                 if match_line:
 
                     timestamp = match_line.group(1)
                     action_name = match_line.group(2)
                     agent_name = match_line.group(3)
-                    params_name = match_line.group(4).split()
+                    params_name = match_line.group(4)
+                    if params_name:
+                        params_name = params_name.split()
+                    else:
+                        params_name = []
 
                     action = get_item_named(action_name)
                     agent = get_item_named(agent_name)
@@ -280,12 +285,16 @@ class FMAPsolver(PDDLPlanner):
                     dates_dict[timestamp].append(act_instance)
 
             dict_s = sorted(dates_dict.items())
+
             for k, v in enumerate(dict_s):
                 index = k + 1
                 for action in v[1]:
                     if index < len(dates_dict):
                         next_action = dict_s[k + 1][1]
                         adjacent_list[action].extend(next_action)
+                    elif len(dates_dict) == 1:
+                        adjacent_list[action] = []
+
         return up.plans.PartialOrderPlan(adjacent_list)
 
 
