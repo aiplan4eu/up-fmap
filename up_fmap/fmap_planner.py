@@ -249,7 +249,7 @@ class FMAPsolver(PDDLPlanner):
         """
         # ^(\d*).+\((\S*).+?(\S*).+?(.+(?=\)))
         dates_dict = defaultdict(list)
-        adjacent_list = defaultdict(list)
+        adjacency_list = defaultdict(list)
         with open(plan_filename) as plan:
             for line in plan.readlines():
                 line = line.lower()
@@ -284,18 +284,18 @@ class FMAPsolver(PDDLPlanner):
 
                     dates_dict[timestamp].append(act_instance)
 
-            dict_s = sorted(dates_dict.items())
+            dict_s = sorted(dates_dict.items(), key=lambda x: int(x[0]))
 
             for k, v in enumerate(dict_s):
                 index = k + 1
                 for action in v[1]:
                     if index < len(dates_dict):
                         next_action = dict_s[k + 1][1]
-                        adjacent_list[action].extend(next_action)
+                        adjacency_list[action].extend(next_action)
                     elif len(dates_dict) == 1:
-                        adjacent_list[action] = []
+                        adjacency_list[action] = []
 
-        return up.plans.PartialOrderPlan(adjacent_list)
+        return up.plans.PartialOrderPlan(adjacency_list)
 
 
 env = up.environment.get_env()
