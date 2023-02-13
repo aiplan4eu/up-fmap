@@ -300,5 +300,5 @@ class FMAPsolver(PDDLPlanner):
         return up.plans.PartialOrderPlan(adjacency_list)
 
 
-env = up.environment.get_env()
+env = up.environment.get_environment()
 env.factory.add_engine("fmap", __name__, "FMAPsolver")
