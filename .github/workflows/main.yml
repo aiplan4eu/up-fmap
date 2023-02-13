@@ -1,11 +1,17 @@
 name: CD
 
-on: push
+on:
+  push:
+    paths:
+      - 'up_fmap/**'
+      - 'setup.py'
+    branches:
+      # Only on master branch
+      - master
 
 jobs:
   deploy-pypi:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' # We only deploy on master commits
 
     steps:
     - name: Checkout repo
@@ -17,14 +23,19 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.8
-
+    - name: Setup java for FMAP
+      uses: actions/setup-java@v2
+      with:
+          distribution: 'microsoft'
+          java-version: '17'
     - name: Make distrib
       run: |
         python3 -m pip install wheel
-        bash make_distrib.sh
-
+        # Create package files
+        python3 setup.py sdist --format=gztar
+        # Wheel file
+        python3 setup.py bdist_wheel
     - name: Upload to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
-        user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
