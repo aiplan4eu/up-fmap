@@ -2,6 +2,7 @@ from unified_planning.shortcuts import *  # type: ignore
 from unified_planning.model.multi_agent import *  # type: ignore
 from collections import namedtuple  # type: ignore
 from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
+from unified_planning.plans import PlanKind  # type: ignore
 from unittest import TestCase, main
 import pkg_resources
 from up_fmap import FMAPsolver
@@ -237,7 +238,7 @@ class FMAPtest(TestCase):
             print("%s returned: %s" % (planner.name, result))
             print(
                 "%s returned Sequential Plan: %s"
-                % (planner.name, result.plan.to_sequential_plan())
+                % (planner.name, result.plan.convert_to(PlanKind.SEQUENTIAL_PLAN, problem))
             )
 
         with OneshotPlanner(name="fmap") as planner:

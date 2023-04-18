@@ -1,7 +1,8 @@
 import pkg_resources  # type: ignore
 import unified_planning as up  # type: ignore
 from unified_planning.model import ProblemKind  # type: ignore
-from unified_planning.engines import PDDLPlanner, Credits, LogMessage  # type: ignore
+from unified_planning.engines import Engine, Credits, LogMessage  # type: ignore
+from unified_planning.engines.mixins import OneshotPlannerMixin  # type: ignore
 from typing import Callable, Dict, IO, List, Optional, Set, Union, cast  # type: ignore
 from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
 import tempfile
@@ -36,11 +37,12 @@ credits = Credits(
 )
 
 
-class FMAPsolver(PDDLPlanner):
+class FMAPsolver(Engine, OneshotPlannerMixin):
     def __init__(
         self, search_algorithm: Optional[str] = None, heuristic: Optional[str] = None
     ):
-        super().__init__(needs_requirements=False)
+        Engine.__init__(self)
+        OneshotPlannerMixin.__init__(self)
         self.search_algorithm = search_algorithm
         self.heuristic = heuristic
 
