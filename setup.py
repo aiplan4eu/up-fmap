@@ -56,7 +56,7 @@ class InstallFMAPdevelop(develop):
 
 setup(
     name="up_fmap",
-    version="0.0.4",
+    version="0.0.5",
     description="up_fmap",
     author="Alejandro Torreño, Eva Onaindia and Oscar Sapena",
     author_email="onaindia@dsic.upv.es",
