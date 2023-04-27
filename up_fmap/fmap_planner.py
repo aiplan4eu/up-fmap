@@ -134,7 +134,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         plan = None
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
-            w = MAPDDLWriter(problem)
+            w = MAPDDLWriter(problem, explicit_false_initial_states=True)
             domain_filename = os.path.join(tempdir, "domain_pddl/")
             problem_filename = os.path.join(tempdir, "problem_pddl/")
             plan_filename = os.path.join(tempdir, "plan.txt")
