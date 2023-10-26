@@ -104,8 +104,6 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         supported_kind.set_conditions_kind("EXISTENTIAL_CONDITIONS")
         supported_kind.set_conditions_kind("UNIVERSAL_CONDITIONS")
         supported_kind.set_effects_kind("CONDITIONAL_EFFECTS")
-        supported_kind.set_fluents_type("INT_FLUENTS")
-        supported_kind.set_fluents_type("REAL_FLUENTS")
         supported_kind.set_fluents_type("OBJECT_FLUENTS")
         return supported_kind
 
@@ -120,9 +118,6 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
     def _solve(
         self,
         problem: "up.model.AbstractProblem",
-        callback: Optional[
-            Callable[["up.engines.results.PlanGenerationResult"], None]
-        ] = None,
         heuristic: Optional[
             Callable[["up.model.state.ROState"], Optional[float]]
         ] = None,
