@@ -94,7 +94,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
 
     @staticmethod
     def supported_kind() -> "ProblemKind":
-        supported_kind = ProblemKind()
+        supported_kind = ProblemKind(version=2)
         supported_kind.set_problem_class("ACTION_BASED_MULTI_AGENT")
         supported_kind.set_typing("FLAT_TYPING")
         supported_kind.set_typing("HIERARCHICAL_TYPING")
@@ -104,7 +104,6 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         supported_kind.set_conditions_kind("EXISTENTIAL_CONDITIONS")
         supported_kind.set_conditions_kind("UNIVERSAL_CONDITIONS")
         supported_kind.set_effects_kind("CONDITIONAL_EFFECTS")
-        supported_kind.set_fluents_type("NUMERIC_FLUENTS")
         supported_kind.set_fluents_type("OBJECT_FLUENTS")
         return supported_kind
 
@@ -119,9 +118,6 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
     def _solve(
         self,
         problem: "up.model.AbstractProblem",
-        callback: Optional[
-            Callable[["up.engines.results.PlanGenerationResult"], None]
-        ] = None,
         heuristic: Optional[
             Callable[["up.model.state.ROState"], Optional[float]]
         ] = None,
