@@ -123,6 +123,8 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         assert isinstance(problem, up.model.Problem) or isinstance(
             problem, up.model.multi_agent.MultiAgentProblem
         )
+        if heuristic is not None:
+            raise up.exceptions.UPUsageError('Custom heuristic is not supported!')
         plan = None
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
@@ -134,8 +136,6 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
             cmd = self._get_cmd_ma(problem, domain_filename, problem_filename)
-            if heuristic is not None:
-                cmd += ["-h", heuristic]
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
