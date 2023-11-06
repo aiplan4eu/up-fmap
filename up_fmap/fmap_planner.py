@@ -88,7 +88,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         if retval != 0:
             return PlanGenerationResultStatus.INTERNAL_ERROR
         elif plan is None:
-            return PlanGenerationResultStatus.UNSOLVABLE_PROVEN
+            return PlanGenerationResultStatus.UNSOLVABLE_INCOMPLETELY
         else:
             return PlanGenerationResultStatus.SOLVED_SATISFICING
 
