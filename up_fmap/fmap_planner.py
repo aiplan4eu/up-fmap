@@ -6,6 +6,7 @@ from unified_planning.engines.mixins import OneshotPlannerMixin  # type: ignore
 from typing import Callable, Dict, IO, List, Optional, Set, Union, cast  # type: ignore
 from unified_planning.io.ma_pddl_writer import MAPDDLWriter  # type: ignore
 import tempfile
+import time
 import os
 import subprocess
 import sys
@@ -136,6 +137,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
             cmd = self._get_cmd_ma(problem, domain_filename, problem_filename)
+            start = time.time()
             if output_stream is None:
                 # If we do not have an output stream to write to, we simply call
                 # a subprocess and retrieve the final output and error with communicate
@@ -177,6 +179,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
                             cmd, output_stream=output_stream, timeout=timeout
                         )
                 timeout_occurred, (proc_out, proc_err), retval = exec_res
+            solving_time = time.time() - start
 
             f = open(plan_filename, "a+")
             pattern = re.compile(r"[Ee]rror|[Ee]xception")
@@ -207,6 +210,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
                 return PlanGenerationResult(
                     PlanGenerationResultStatus.TIMEOUT,
                     plan=plan,
+                    metrics={"engine_internal_time": str(solving_time)},
                     log_messages=logs,
                     engine_name=self.name,
                 )
@@ -214,7 +218,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
             problem, plan, retval, logs
         )
         return PlanGenerationResult(
-            status, plan, log_messages=logs, engine_name=self.name
+            status, plan, log_messages=logs, engine_name=self.name, metrics={"engine_internal_time": str(solving_time)}
         )
 
     def _plan_from_file(
