@@ -66,16 +66,15 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
             "-jar",
             pkg_resources.resource_filename("up_fmap", "FMAP/FMAP.jar"),
         ]
-        directory = "ma_pddl_"
         for ag in problem.agents:
             base_command.extend(
                 [
                     f"{ag.name}_type",
-                    f"{directory}{domain_filename}{ag.name}_domain.pddl",
+                    os.path.join(domain_filename, f"{ag.name}_domain.pddl"),
                 ]
             )
             base_command.extend(
-                [f"{directory}{problem_filename}{ag.name}_problem.pddl"]
+                [os.path.join(problem_filename, f"{ag.name}_problem.pddl")]
             )
         return self._manage_parameters(base_command)
 
@@ -130,10 +129,9 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
         logs: List["up.engines.results.LogMessage"] = []
         with tempfile.TemporaryDirectory() as tempdir:
             w = MAPDDLWriter(problem, explicit_false_initial_states=True)
-            domain_filename = os.path.join(tempdir, "domain_pddl/")
-            problem_filename = os.path.join(tempdir, "problem_pddl/")
+            domain_filename = os.path.join(tempdir, "domain_pddl")
+            problem_filename = os.path.join(tempdir, "problem_pddl")
             plan_filename = os.path.join(tempdir, "plan.txt")
-            plan_filename = "ma_pddl_" + plan_filename
             w.write_ma_domain(domain_filename)
             w.write_ma_problem(problem_filename)
             cmd = self._get_cmd_ma(problem, domain_filename, problem_filename)
@@ -209,7 +207,7 @@ class FMAPsolver(Engine, OneshotPlannerMixin):
                 process.wait()
                 return PlanGenerationResult(
                     PlanGenerationResultStatus.TIMEOUT,
-                    plan=plan,
+                    plan=None,
                     metrics={"engine_internal_time": str(solving_time)},
                     log_messages=logs,
                     engine_name=self.name,
